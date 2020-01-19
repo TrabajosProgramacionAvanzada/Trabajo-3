@@ -11,24 +11,34 @@ typedef struct torre
   int y;
 }torre;
 
-void llenar_matriz(torre matrix){
-    int y, x = 0;
-    matrix.y = matrix.x = 0;
+void llenar_matriz(torre* matrix){
+    int y = 0;
+    int x = 0;
+    int z = 0;
+    matrix->y = matrix->x = 0;
     double time1 = clock();
 	FILE* document = fopen("M.tex", "r");
-    while (1 == fscanf(document, "%d", &matrix.mapa[x][y]) && x < 96 && y < 12){
-        if(y >= 11){
-            y = 0;
-            x++;
-        }else
+    fscanf(document, "%d", &z);
+    matrix->mapa[0][0] = z;
+    y++;
+    while (x < 96){
+        while (!feof(document) && y < 12){
+            fscanf(document, "%d", &z);
+            matrix->mapa[x][y] = z;
+            printf("| %d ", matrix->mapa[x][y]);
             y++;
+        }
+        x++;
+        y = 0;
+        matrix->mapa[x][0]=z;
+        printf("|\n| %d ",z);
     }
     time1 = (clock() - time1) / CLOCKS_PER_SEC;
 	printf("lectura de matriz: %.4lf \n", time1);
     return;
 }
 
-void calcular_camino_minimo(torre matriz){
+void calcular_camino_minimo(torre *matriz){
     int peso = 0;
     int aux = 900000000;
     int aux2 = 0;
@@ -38,22 +48,22 @@ void calcular_camino_minimo(torre matriz){
     while (x < 96){
         y = 0;
         while (y < 12){
-            peso = abs(matriz.y - y) + matriz.mapa[x][y];
+            peso = abs(matriz->y - y) + matriz->mapa[x][y];
             if (peso < aux){
                 aux = peso;
                 aux2 = y;
             }
             y++;
         }
-        matriz.x = x;
-        matriz.y = aux2;
-        matriz.pasos[x][0] = x;
-        matriz.pasos[x][1] = aux2;
+        printf("(%d, %d) con peso: %d\n", x, aux2 + 1, aux);
+        matriz->x = x;
+        matriz->y = aux2;
+        matriz->pasos[x][0] = x;
+        matriz->pasos[x][1] = aux2;
         if(x > 1)
-            matriz.pasos[x][2] = matriz.pasos[x-1][2] + aux;
-        else{
-            matriz.pasos[x][2] = aux;
-        }
+            matriz->pasos[x][2] = aux + matriz->pasos[x-1][2];
+        else
+            matriz->pasos[x][2] = aux;
         aux = 900000000;
         x++;
     }
@@ -64,14 +74,10 @@ void calcular_camino_minimo(torre matriz){
 
 int main() {
     int x = 0;
+    int y = 0;
     torre camino;
-    llenar_matriz(camino);
-    calcular_camino_minimo(camino);
-    while (x < 96){
-        printf("el camino tomado es por: (%d , %d)\n", x+1, camino.pasos[x][2]);
-        printf("en el %d ° psio el peso acumulado es: %d\n", x+1, camino.pasos[x][1]);
-        x++;
-        getchar();
-    }
+    llenar_matriz(&camino);
+    calcular_camino_minimo(&camino);
+    printf("peso total: %d\n", camino.pasos[95][2]);
     return 0;
 }
