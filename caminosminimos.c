@@ -98,22 +98,13 @@ int main() {
     torre camino;
     int f = 1;
     llenar_matriz(&camino);
-    FILE *complejidad = fopen("complejidadcamino.csv", "a");
-    fclose(complejidad);
-    while(t<=20){
-
-        t=clock();
-        calcular_camino_minimo(&camino);
-        t=clock()-t;
-        t=t/CLOCKS_PER_SEC;
-        complejidad = fopen("complejidadcamino.csv", "a");
-        fprintf(complejidad, "%d, %f\n", f, t);
-        fclose(complejidad);
-        f=f+5;
-
-    }
+    t=clock();
+    calcular_camino_minimo(&camino);
+    t=clock()-t;
+    t=t/CLOCKS_PER_SEC;
+    printf("tiempo empleado en calcular camino mnimo: %lf\n", t);
     
 
-    printf("peso total: %d\n", camino.pasos[95][2]);
+    //printf("peso total: %d\n", camino.pasos[95][2]);
     return 0;
 }
